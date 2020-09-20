@@ -5,7 +5,7 @@ trigger UpdateAccount on Account (after update) {
     for (Account a : Trigger.New){
         for(Contact c : [Select Id, FirstName, LastName, Profile__c from Contact where
                                 AccountId IN :Trigger.New]){
-            c.Profile__c = a.Website + '/' + c.FirstName + c.LastName;
+            c.Profile__c = a.Website + '/' + c.FirstName.subString(0,1) + c.LastName;
             contToUpdate.add(c);
         }
     }
