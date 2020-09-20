@@ -1,0 +1,42 @@
+Trigger-1: To Create new Contact during Creation of New Account:
+
+trigger CreateContact on Account (after insert) {
+    
+    List<Contact> conlis = new List<Contact>();
+   	
+    for(Account a : Trigger.New){
+        conlis.add(new Contact(
+        	FirstName = 'Info',
+            LastName = 'Default',
+            Email = 'info@websitedomain.tld',
+            AccountId = a.Id
+        ));
+    }
+    
+    insert conlis;
+}
+
+==================================================================
+
+Trigger-2: To Update the Account Only_Default_Contact field, When the Contact is more than one:
+
+trigger updateAccountcontact on Contact (after insert) {
+	
+    Integer NoOfContact ;
+    List<Account> aclist = new List<Account>();
+    
+    for(Contact c : Trigger.New){
+        Account ac = [Select Id, Only_Default_Contact__c from Account where Id = :c.AccountId];
+        String accId = c.AccountId;
+        NoOfContact = Database.countQuery('Select count() from Contact where AccountID = :accId');
+        if(NoOfContact <= 1	){
+            ac.Only_Default_Contact__c = TRUE;
+            aclist.add(ac);
+        }
+        else{
+            ac.Only_Default_Contact__c = FALSE;
+            aclist.add(ac);
+        }
+    }
+    update aclist;
+}
